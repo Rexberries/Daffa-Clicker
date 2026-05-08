@@ -19,8 +19,13 @@
     box-sizing:border-box;
 }
 
-body{
+html,body{
+    width:100%;
+    height:100%;
     overflow:hidden;
+}
+
+body{
     font-family:'Segoe UI',sans-serif;
     background:var(--pink-soft);
     user-select:none;
@@ -35,29 +40,31 @@ body{
     align-items:center;
     z-index:999;
     background:var(--pink-soft);
+    padding:20px;
 }
 
 .card{
     background:white;
-    padding:40px;
+    padding:25px;
     border-radius:30px;
     border:5px solid var(--pink);
     text-align:center;
     width:90%;
-    max-width:400px;
+    max-width:340px;
     box-shadow:0 10px 30px rgba(244,114,182,.2);
 }
 
 .card h1{
     color:var(--pink);
     margin-bottom:15px;
-    font-size:2.5rem;
+    font-size:2rem;
 }
 
 .card p{
     color:var(--dark);
     line-height:1.5;
     margin-bottom:25px;
+    font-size:.95rem;
 }
 
 .play-btn{
@@ -65,7 +72,7 @@ body{
     background:var(--pink);
     color:white;
     padding:15px 35px;
-    font-size:1.2rem;
+    font-size:1.1rem;
     border-radius:999px;
     cursor:pointer;
     font-weight:bold;
@@ -80,10 +87,11 @@ body{
 
 /* GAME */
 #game{
-    width:100vw;
-    height:100vh;
+    width:100%;
+    height:100dvh;
     display:none;
     position:relative;
+    overflow:hidden;
 }
 
 #top-ui{
@@ -96,7 +104,7 @@ body{
 }
 
 #score{
-    font-size:4rem;
+    font-size:2.7rem;
     font-weight:900;
     color:var(--pink);
     text-shadow:2px 2px white;
@@ -105,12 +113,14 @@ body{
 #stats{
     color:var(--purple);
     font-weight:bold;
-    font-size:1.2rem;
+    font-size:1rem;
+    padding:0 10px;
 }
 
 /* CAT */
 #cat{
-    width:140px;
+    width:95px;
+    max-width:22vw;
     position:absolute;
     transform:translate(-50%,-50%);
     cursor:pointer;
@@ -130,6 +140,7 @@ body{
     pointer-events:none;
     animation:float .8s forwards;
     z-index:999;
+    font-size:1.1rem;
 }
 
 @keyframes float{
@@ -146,31 +157,34 @@ body{
 /* SHOP */
 #shop-btn{
     position:absolute;
-    left:20px;
-    bottom:20px;
+    left:15px;
+    bottom:15px;
     border:none;
     background:white;
     color:var(--pink);
     border:3px solid var(--pink);
-    padding:12px 20px;
+    padding:10px 16px;
     border-radius:999px;
     cursor:pointer;
     font-weight:bold;
     z-index:200;
+    font-size:.9rem;
 }
 
 #shop{
     position:absolute;
     top:0;
     right:-320px;
-    width:280px;
+    width:75%;
+    max-width:260px;
     height:100%;
     background:rgba(255,255,255,.92);
     backdrop-filter:blur(10px);
     border-left:5px solid var(--pink);
     transition:.3s;
-    padding:20px;
+    padding:16px;
     z-index:199;
+    overflow-y:auto;
 }
 
 #shop.open{
@@ -185,7 +199,7 @@ body{
 .item{
     background:white;
     border:2px solid #fbcfe8;
-    padding:15px;
+    padding:12px;
     border-radius:18px;
     margin-bottom:12px;
     cursor:pointer;
@@ -201,10 +215,12 @@ body{
     color:var(--pink);
     display:block;
     margin-bottom:5px;
+    font-size:.95rem;
 }
 
 .item small{
     color:#64748b;
+    font-size:.8rem;
 }
 
 /* FEVER */
@@ -214,12 +230,34 @@ body{
     display:none;
     justify-content:center;
     align-items:center;
-    font-size:5rem;
+    font-size:2.2rem;
     font-weight:900;
     color:#f59e0b;
     text-shadow:3px 3px white;
     z-index:888;
     pointer-events:none;
+    text-align:center;
+    padding:20px;
+}
+
+/* MOBILE */
+@media (max-width:400px){
+
+    #score{
+        font-size:2.2rem;
+    }
+
+    .card h1{
+        font-size:1.7rem;
+    }
+
+    #cat{
+        width:80px;
+    }
+
+    #shop{
+        width:80%;
+    }
 }
 </style>
 </head>
@@ -230,6 +268,7 @@ body{
 <div id="welcome">
     <div class="card">
         <h1>Hai Sayang ❤️</h1>
+
         <p>
             Klik kucing secepat mungkin buat kumpulin love points!
             Jangan sampe miss ya 😾
@@ -244,10 +283,13 @@ body{
 <!-- GAME -->
 <div id="game">
 
-    <div id="fever">FEVER MODE 🔥</div>
+    <div id="fever">
+        FEVER MODE 🔥
+    </div>
 
     <div id="top-ui">
         <div id="score">0</div>
+
         <div id="stats">
             Combo: 0 | Multiplier: 1x
         </div>
@@ -266,6 +308,7 @@ body{
     </button>
 
     <div id="shop">
+
         <h2>Kedai Imut</h2>
 
         <div class="item" onclick="buy('slow',50)">
@@ -284,9 +327,10 @@ body{
         </div>
 
         <div class="item" onclick="buy('fever',1000)">
-            <b>🔥 Fever Candy (1000)</b>
-            <small>Multiplier +5</small>
+            <b>🔥 Final Gift (1000)</b>
+            <small>Special surprise ❤️</small>
         </div>
+
     </div>
 </div>
 
@@ -299,6 +343,14 @@ const state = {
     playing:false
 };
 
+/* ITEM SEKALI BELI */
+const purchased = {
+    slow:false,
+    power:false,
+    auto:false,
+    fever:false
+};
+
 const cat = document.getElementById("cat");
 const scoreEl = document.getElementById("score");
 const statsEl = document.getElementById("stats");
@@ -309,6 +361,7 @@ let moveLoop;
 
 /* START */
 function startGame(){
+
     state.playing = true;
 
     document.getElementById("welcome").style.display = "none";
@@ -316,15 +369,23 @@ function startGame(){
 
     moveCat();
     resetLoop();
-
-    startRandomFever();
 }
 
 /* MOVE CAT */
 function moveCat(){
 
-    const x = Math.random() * (window.innerWidth - 160) + 80;
-    const y = Math.random() * (window.innerHeight - 220) + 120;
+    const catSize =
+        window.innerWidth < 500 ? 90 : 140;
+
+    const x =
+        Math.random() *
+        (window.innerWidth - catSize)
+        + (catSize / 2);
+
+    const y =
+        Math.random() *
+        (window.innerHeight - 220)
+        + 120;
 
     cat.style.left = x + "px";
     cat.style.top = y + "px";
@@ -335,11 +396,14 @@ function moveCat(){
 
 /* TIMER */
 function resetLoop(){
+
     clearInterval(moveLoop);
-    moveLoop = setInterval(moveCat, state.speed);
+
+    moveLoop =
+        setInterval(moveCat, state.speed);
 }
 
-/* CLICK CAT */
+/* CLICK */
 function clickCat(e){
 
     e.stopPropagation();
@@ -348,9 +412,11 @@ function clickCat(e){
 
     state.combo++;
 
-    let comboBonus = Math.floor(state.combo / 10);
+    let comboBonus =
+        Math.floor(state.combo / 10);
 
-    let gained = state.power + comboBonus;
+    let gained =
+        state.power + comboBonus;
 
     state.score += gained;
 
@@ -361,7 +427,9 @@ function clickCat(e){
         "#f472b6"
     );
 
-    if(state.combo % 5 === 0 && state.speed > 500){
+    if(state.combo % 5 === 0 &&
+       state.speed > 500){
+
         state.speed -= 70;
     }
 
@@ -384,6 +452,7 @@ function missClick(e){
     }
 
     if(e.target.id !== "cat"){
+
         state.combo = 0;
 
         updateUI();
@@ -397,12 +466,15 @@ function missClick(e){
     }
 }
 
-/* UPDATE */
+/* UPDATE UI */
 function updateUI(){
 
-    scoreEl.innerText = Math.floor(state.score);
+    scoreEl.innerText =
+        Math.floor(state.score);
 
-    const mult = state.power + Math.floor(state.combo/10);
+    const mult =
+        state.power +
+        Math.floor(state.combo/10);
 
     statsEl.innerText =
         `Combo: ${state.combo} | Multiplier: ${mult}x`;
@@ -411,7 +483,8 @@ function updateUI(){
 /* FLOAT TEXT */
 function spawnText(x,y,text,color){
 
-    const div = document.createElement("div");
+    const div =
+        document.createElement("div");
 
     div.className = "float";
     div.innerText = text;
@@ -419,7 +492,6 @@ function spawnText(x,y,text,color){
     div.style.left = x + "px";
     div.style.top = y + "px";
     div.style.color = color;
-    div.style.fontSize = "1.5rem";
 
     document.body.appendChild(div);
 
@@ -430,20 +502,36 @@ function spawnText(x,y,text,color){
 
 /* SHOP */
 function toggleShop(e){
+
     e.stopPropagation();
+
     shop.classList.toggle("open");
 }
 
 /* BUY */
 function buy(type,cost){
 
+    /* SUDAH DIBELI */
+    if(purchased[type]){
+
+        alert("Item ini udah dibeli 😾");
+
+        return;
+    }
+
+    /* CEK SCORE */
     if(state.score < cost){
+
         alert("Poin belum cukup 😾");
+
         return;
     }
 
     state.score -= cost;
 
+    purchased[type] = true;
+
+    /* EFFECT */
     if(type === "slow"){
         state.speed += 500;
     }
@@ -453,14 +541,29 @@ function buy(type,cost){
     }
 
     if(type === "auto"){
+
         setInterval(()=>{
+
             state.score += state.power;
+
             updateUI();
+
         },1000);
     }
 
+    /* FINAL ITEM */
     if(type === "fever"){
+
         state.power += 5;
+
+        feverEl.innerHTML =
+            "Happy Eight Of The Month Sayanggku ❤️";
+
+        feverEl.style.display = "flex";
+
+        setTimeout(()=>{
+            feverEl.style.display = "none";
+        },5000);
     }
 
     updateUI();
@@ -471,35 +574,23 @@ function buy(type,cost){
         "UPGRADE ✨",
         "#22c55e"
     );
-}
 
-/* RANDOM FEVER EVENT */
-function startRandomFever(){
+    /* DISABLE ITEM */
+    const items =
+        document.querySelectorAll(".item");
 
-    setInterval(()=>{
+    items.forEach(item => {
 
-        if(state.score > 100 && Math.random() > 0.7){
+        if(
+            item.getAttribute("onclick")
+            .includes(type)
+        ){
 
-            feverEl.style.display = "flex";
-
-            const oldSpeed = state.speed;
-
-            state.speed = 250;
-
-            resetLoop();
-
-            setTimeout(()=>{
-
-                feverEl.style.display = "none";
-
-                state.speed = oldSpeed;
-
-                resetLoop();
-
-            },4000);
+            item.style.opacity = ".5";
+            item.style.pointerEvents = "none";
+            item.style.filter = "grayscale(1)";
         }
-
-    },12000);
+    });
 }
 </script>
 
