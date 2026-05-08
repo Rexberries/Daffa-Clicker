@@ -1,40 +1,510 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DAFFA CLICKER</title>
-    <style>
-        :root {
-            --pink-soft: #fdf2f8;
-            --pink-bright: #f472b6;
-            --purple-cute: #a78bfa;
-            --text-dark: #475569;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Daffa Clicker ❤️</title>
+
+<style>
+:root{
+    --pink:#f472b6;
+    --pink-soft:#fdf2f8;
+    --purple:#a78bfa;
+    --dark:#475569;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    font-family:'Segoe UI',sans-serif;
+    background:var(--pink-soft);
+    user-select:none;
+}
+
+/* WELCOME */
+#welcome{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+    background:var(--pink-soft);
+}
+
+.card{
+    background:white;
+    padding:40px;
+    border-radius:30px;
+    border:5px solid var(--pink);
+    text-align:center;
+    width:90%;
+    max-width:400px;
+    box-shadow:0 10px 30px rgba(244,114,182,.2);
+}
+
+.card h1{
+    color:var(--pink);
+    margin-bottom:15px;
+    font-size:2.5rem;
+}
+
+.card p{
+    color:var(--dark);
+    line-height:1.5;
+    margin-bottom:25px;
+}
+
+.play-btn{
+    border:none;
+    background:var(--pink);
+    color:white;
+    padding:15px 35px;
+    font-size:1.2rem;
+    border-radius:999px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:.2s;
+    box-shadow:0 6px #db2777;
+}
+
+.play-btn:active{
+    transform:translateY(4px);
+    box-shadow:0 2px #db2777;
+}
+
+/* GAME */
+#game{
+    width:100vw;
+    height:100vh;
+    display:none;
+    position:relative;
+}
+
+#top-ui{
+    position:absolute;
+    top:20px;
+    width:100%;
+    text-align:center;
+    z-index:100;
+    pointer-events:none;
+}
+
+#score{
+    font-size:4rem;
+    font-weight:900;
+    color:var(--pink);
+    text-shadow:2px 2px white;
+}
+
+#stats{
+    color:var(--purple);
+    font-weight:bold;
+    font-size:1.2rem;
+}
+
+/* CAT */
+#cat{
+    width:140px;
+    position:absolute;
+    transform:translate(-50%,-50%);
+    cursor:pointer;
+    z-index:50;
+    transition:.08s;
+    filter:drop-shadow(0 10px 10px rgba(0,0,0,.12));
+}
+
+#cat:active{
+    transform:translate(-50%,-50%) scale(.9);
+}
+
+/* FLOAT */
+.float{
+    position:absolute;
+    font-weight:900;
+    pointer-events:none;
+    animation:float .8s forwards;
+    z-index:999;
+}
+
+@keyframes float{
+    from{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+    to{
+        opacity:0;
+        transform:translateY(-100px) scale(1.5);
+    }
+}
+
+/* SHOP */
+#shop-btn{
+    position:absolute;
+    left:20px;
+    bottom:20px;
+    border:none;
+    background:white;
+    color:var(--pink);
+    border:3px solid var(--pink);
+    padding:12px 20px;
+    border-radius:999px;
+    cursor:pointer;
+    font-weight:bold;
+    z-index:200;
+}
+
+#shop{
+    position:absolute;
+    top:0;
+    right:-320px;
+    width:280px;
+    height:100%;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(10px);
+    border-left:5px solid var(--pink);
+    transition:.3s;
+    padding:20px;
+    z-index:199;
+}
+
+#shop.open{
+    right:0;
+}
+
+#shop h2{
+    color:var(--pink);
+    margin-bottom:20px;
+}
+
+.item{
+    background:white;
+    border:2px solid #fbcfe8;
+    padding:15px;
+    border-radius:18px;
+    margin-bottom:12px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.item:hover{
+    transform:scale(1.03);
+    border-color:var(--pink);
+}
+
+.item b{
+    color:var(--pink);
+    display:block;
+    margin-bottom:5px;
+}
+
+.item small{
+    color:#64748b;
+}
+
+/* FEVER */
+#fever{
+    position:fixed;
+    inset:0;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    font-size:5rem;
+    font-weight:900;
+    color:#f59e0b;
+    text-shadow:3px 3px white;
+    z-index:888;
+    pointer-events:none;
+}
+</style>
+</head>
+
+<body onclick="missClick(event)">
+
+<!-- WELCOME -->
+<div id="welcome">
+    <div class="card">
+        <h1>Hai Sayang ❤️</h1>
+        <p>
+            Klik kucing secepat mungkin buat kumpulin love points!
+            Jangan sampe miss ya 😾
+        </p>
+
+        <button class="play-btn" onclick="startGame()">
+            MAIN ✨
+        </button>
+    </div>
+</div>
+
+<!-- GAME -->
+<div id="game">
+
+    <div id="fever">FEVER MODE 🔥</div>
+
+    <div id="top-ui">
+        <div id="score">0</div>
+        <div id="stats">
+            Combo: 0 | Multiplier: 1x
+        </div>
+    </div>
+
+    <img
+        id="cat"
+        src="daffa.jpg"
+        alt="cat"
+        onclick="clickCat(event)"
+    >
+
+    <!-- SHOP -->
+    <button id="shop-btn" onclick="toggleShop(event)">
+        🎁 Hadiah
+    </button>
+
+    <div id="shop">
+        <h2>Kedai Imut</h2>
+
+        <div class="item" onclick="buy('slow',50)">
+            <b>🍼 Susu Hangat (50)</b>
+            <small>Kucing melambat</small>
+        </div>
+
+        <div class="item" onclick="buy('power',200)">
+            <b>💖 Love Boost (200)</b>
+            <small>Poin klik naik</small>
+        </div>
+
+        <div class="item" onclick="buy('auto',500)">
+            <b>🤖 Auto Clicker (500)</b>
+            <small>Auto poin tiap detik</small>
+        </div>
+
+        <div class="item" onclick="buy('fever',1000)">
+            <b>🔥 Fever Candy (1000)</b>
+            <small>Multiplier +5</small>
+        </div>
+    </div>
+</div>
+
+<script>
+const state = {
+    score:0,
+    combo:0,
+    power:1,
+    speed:1800,
+    playing:false
+};
+
+const cat = document.getElementById("cat");
+const scoreEl = document.getElementById("score");
+const statsEl = document.getElementById("stats");
+const shop = document.getElementById("shop");
+const feverEl = document.getElementById("fever");
+
+let moveLoop;
+
+/* START */
+function startGame(){
+    state.playing = true;
+
+    document.getElementById("welcome").style.display = "none";
+    document.getElementById("game").style.display = "block";
+
+    moveCat();
+    resetLoop();
+
+    startRandomFever();
+}
+
+/* MOVE CAT */
+function moveCat(){
+
+    const x = Math.random() * (window.innerWidth - 160) + 80;
+    const y = Math.random() * (window.innerHeight - 220) + 120;
+
+    cat.style.left = x + "px";
+    cat.style.top = y + "px";
+
+    cat.style.transform =
+        `translate(-50%,-50%) rotate(${(Math.random()-.5)*30}deg)`;
+}
+
+/* TIMER */
+function resetLoop(){
+    clearInterval(moveLoop);
+    moveLoop = setInterval(moveCat, state.speed);
+}
+
+/* CLICK CAT */
+function clickCat(e){
+
+    e.stopPropagation();
+
+    if(!state.playing) return;
+
+    state.combo++;
+
+    let comboBonus = Math.floor(state.combo / 10);
+
+    let gained = state.power + comboBonus;
+
+    state.score += gained;
+
+    spawnText(
+        e.clientX,
+        e.clientY,
+        `+${gained} ❤️`,
+        "#f472b6"
+    );
+
+    if(state.combo % 5 === 0 && state.speed > 500){
+        state.speed -= 70;
+    }
+
+    updateUI();
+
+    moveCat();
+    resetLoop();
+}
+
+/* MISS */
+function missClick(e){
+
+    if(!state.playing) return;
+
+    if(
+        e.target.id === "shop-btn" ||
+        shop.contains(e.target)
+    ){
+        return;
+    }
+
+    if(e.target.id !== "cat"){
+        state.combo = 0;
+
+        updateUI();
+
+        spawnText(
+            e.clientX,
+            e.clientY,
+            "MISS 💔",
+            "#94a3b8"
+        );
+    }
+}
+
+/* UPDATE */
+function updateUI(){
+
+    scoreEl.innerText = Math.floor(state.score);
+
+    const mult = state.power + Math.floor(state.combo/10);
+
+    statsEl.innerText =
+        `Combo: ${state.combo} | Multiplier: ${mult}x`;
+}
+
+/* FLOAT TEXT */
+function spawnText(x,y,text,color){
+
+    const div = document.createElement("div");
+
+    div.className = "float";
+    div.innerText = text;
+
+    div.style.left = x + "px";
+    div.style.top = y + "px";
+    div.style.color = color;
+    div.style.fontSize = "1.5rem";
+
+    document.body.appendChild(div);
+
+    setTimeout(()=>{
+        div.remove();
+    },800);
+}
+
+/* SHOP */
+function toggleShop(e){
+    e.stopPropagation();
+    shop.classList.toggle("open");
+}
+
+/* BUY */
+function buy(type,cost){
+
+    if(state.score < cost){
+        alert("Poin belum cukup 😾");
+        return;
+    }
+
+    state.score -= cost;
+
+    if(type === "slow"){
+        state.speed += 500;
+    }
+
+    if(type === "power"){
+        state.power += 1;
+    }
+
+    if(type === "auto"){
+        setInterval(()=>{
+            state.score += state.power;
+            updateUI();
+        },1000);
+    }
+
+    if(type === "fever"){
+        state.power += 5;
+    }
+
+    updateUI();
+
+    spawnText(
+        window.innerWidth/2,
+        window.innerHeight/2,
+        "UPGRADE ✨",
+        "#22c55e"
+    );
+}
+
+/* RANDOM FEVER EVENT */
+function startRandomFever(){
+
+    setInterval(()=>{
+
+        if(state.score > 100 && Math.random() > 0.7){
+
+            feverEl.style.display = "flex";
+
+            const oldSpeed = state.speed;
+
+            state.speed = 250;
+
+            resetLoop();
+
+            setTimeout(()=>{
+
+                feverEl.style.display = "none";
+
+                state.speed = oldSpeed;
+
+                resetLoop();
+
+            },4000);
         }
 
-        body {
-            margin: 0; padding: 0; overflow: hidden;
-            background-color: var(--pink-soft);
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            color: var(--text-dark);
-            user-select: none;
-            touch-action: manipulation;
-        }
+    },12000);
+}
+</script>
 
-        /* --- LAYAR AWAL (WELCOME) --- */
-        #welcome-screen {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: var(--pink-soft);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000;
-        }
-
-        .card {
-            background: white; padding: 40px; border-radius: 35px;
-            border: 6px solid var(--pink-bright); text-align: center;
-            box-shadow: 0 10px 25px rgba(244, 114, 182, 0.2);
-            max-width: 350px;
-        }
+</body>
+</html>        }
 
         h1 { color: var(--pink-bright); font-size: 2.5rem; margin-bottom: 15px; }
 
