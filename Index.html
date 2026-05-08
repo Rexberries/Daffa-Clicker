@@ -16,7 +16,7 @@
             padding: 0;
             overflow: hidden;
             background: #000;
-            font-family: 'Comic Sans MS', sans-serif;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
             color: white;
             user-select: none;
             touch-action: manipulation;
@@ -27,112 +27,118 @@
             height: 100vh;
             position: relative;
             background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* UI Styling */
+        /* Interface Atas */
         #top-gui {
             position: absolute;
-            top: 20px;
-            width: 100%;
+            top: 30px;
             text-align: center;
             z-index: 100;
             pointer-events: none;
         }
 
         .score-container {
-            font-size: 3.5rem;
+            font-size: 4rem;
             font-weight: 900;
-            text-shadow: 0 0 10px var(--neon-pink);
+            text-shadow: 0 0 15px var(--neon-pink);
             margin: 0;
         }
 
         #combo-ui {
-            font-size: 1.8rem;
+            font-size: 2rem;
             color: var(--neon-blue);
-            text-shadow: 0 0 5px var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            font-style: italic;
             display: none;
         }
 
         /* Target Kucing */
         #pixie-target {
             position: absolute;
-            width: 140px;
+            width: 150px; /* Ukuran pas untuk mobile/desktop */
             cursor: pointer;
             z-index: 50;
-            transition: transform 0.05s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            filter: drop-shadow(0 0 10px white);
+            transition: transform 0.05s;
+            filter: drop-shadow(0 0 15px white);
             transform: translate(-50%, -50%);
         }
 
         #pixie-target:active {
-            transform: translate(-50%, -50%) scale(0.7) rotate(-15deg) !important;
+            transform: translate(-50%, -50%) scale(0.75) rotate(-20deg) !important;
         }
 
-        /* Floating Text */
+        /* Teks Melayang */
         .float-text {
             position: absolute;
             font-weight: bold;
             pointer-events: none;
             z-index: 150;
-            animation: floatMove 0.7s ease-out forwards;
+            animation: floatMove 0.8s ease-out forwards;
         }
 
         @keyframes floatMove {
             0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(20px, -120px) scale(1.5); opacity: 0; }
+            100% { transform: translate(30px, -150px) scale(1.8); opacity: 0; }
         }
 
-        /* Shop Panel */
+        /* Panel Shop */
         #shop-toggle {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
+            bottom: 25px;
+            right: 25px;
             background: var(--neon-green);
             color: black;
-            padding: 12px 24px;
+            padding: 15px 30px;
             border-radius: 50px;
             font-weight: bold;
+            font-size: 1.2rem;
             cursor: pointer;
             z-index: 200;
-            border: none;
+            border: 4px solid black;
+            box-shadow: 0 0 15px var(--neon-green);
         }
 
         #shop-panel {
             position: absolute;
-            right: -300px;
+            right: -320px;
             top: 0;
-            width: 260px;
+            width: 280px;
             height: 100%;
             background: rgba(0, 0, 0, 0.95);
-            border-left: 3px solid var(--neon-green);
-            transition: 0.3s;
+            border-left: 4px solid var(--neon-green);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 199;
-            padding: 20px;
+            padding: 30px 20px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
         #shop-panel.open { right: 0; }
 
         .upgrade-btn {
-            background: #222;
-            border: 1px solid var(--neon-blue);
+            background: #1a1a1a;
+            border: 2px solid var(--neon-blue);
             color: white;
-            padding: 10px;
+            padding: 15px;
             text-align: left;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: 12px;
+            font-family: inherit;
         }
 
-        .upgrade-btn b { color: var(--neon-green); }
+        .upgrade-btn b { color: var(--neon-green); font-size: 1.1rem; }
 
-        /* Effects */
-        .glitch { animation: glitch 0.1s infinite; }
+        /* Efek Chaos */
+        .glitch { animation: glitch 0.15s infinite; }
         @keyframes glitch {
-            0% { transform: translate(2px, 2px); }
-            50% { transform: translate(-2px, -2px); }
+            0% { transform: translate(3px, 3px); }
+            50% { transform: translate(-3px, -3px) rotate(1deg); }
             100% { transform: translate(0); }
         }
 
@@ -141,13 +147,13 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 4rem;
-            color: red;
-            font-weight: bold;
+            font-size: 5rem;
+            color: #ff0000;
+            font-weight: 900;
             z-index: 300;
             display: none;
             text-align: center;
-            text-shadow: 5px 5px black;
+            text-shadow: 5px 5px 20px black;
             pointer-events: none;
         }
     </style>
@@ -159,7 +165,7 @@
 
         <div id="top-gui">
             <h1 class="score-container">SCORE: <span id="score-val">0</span></h1>
-            <div id="combo-ui">COMBO x0</div>
+            <div id="combo-ui">MEOW COMBO x0</div>
         </div>
 
         <img id="pixie-target" 
@@ -167,30 +173,44 @@
              alt="Pixie" 
              onclick="onTargetClick(event)">
 
-        <button id="shop-toggle" onclick="toggleShop(event)">SHOP</button>
+        <button id="shop-toggle" onclick="toggleShop(event)">SHOP (UPGRADES)</button>
         
-        <div id="shop-panel">
-            <h2 style="color: var(--neon-green);">BRAINROT SHOP</h2>
-            <button class="upgrade-btn" onclick="buyUpgrade('catnip', 50, event)">🌿 <b>Catnip (50)</b><br>Slows down Pixie</button>
-            <button class="upgrade-btn" onclick="buyUpgrade('laser', 150, event)">🔴 <b>Laser (150)</b><br>Auto-clicks 1.5s</button>
-            <button class="upgrade-btn" onclick="buyUpgrade('wetfood', 500, event)">🥫 <b>Wet Food (500)</b><br>Score x2 Multiplier</button>
-            <button class="upgrade-btn" onclick="buyUpgrade('chaos', 1000, event)">🌀 <b>Chaos (1000)</b><br>Visual Glitch</button>
+        <div id="shop-panel" id="shop">
+            <h2 style="color: var(--neon-green); margin-bottom: 10px;">BRAINROT MENU</h2>
+            <button class="upgrade-btn" onclick="buyUpgrade('catnip', 50, event)">
+                🌿 <b>Catnip (50)</b><br>Bikin Pixie lebih lambat.
+            </button>
+            <button class="upgrade-btn" onclick="buyUpgrade('laser', 150, event)">
+                🔴 <b>Laser (150)</b><br>Auto-klik tiap 1.5 detik.
+            </button>
+            <button class="upgrade-btn" onclick="buyUpgrade('wetfood', 500, event)">
+                🥫 <b>Wet Food (500)</b><br>Skor dapet 2x lipat!
+            </button>
+            <button class="upgrade-btn" onclick="buyUpgrade('chaos', 1000, event)">
+                🌀 <b>Chaos Mode (1000)</b><br>Hancurkan layar ini.
+            </button>
         </div>
     </div>
 
     <script>
-        let state = { score: 0, combo: 0, multiplier: 1, speed: 1800 };
+        let state = { score: 0, combo: 0, multiplier: 1, speed: 1800, autoClickers: 0 };
         const target = document.getElementById('pixie-target');
         const scoreEl = document.getElementById('score-val');
         const comboEl = document.getElementById('combo-ui');
         const shop = document.getElementById('shop-panel');
+        const container = document.getElementById('game-container');
+        const eventText = document.getElementById('event-overlay');
 
         function moveTarget() {
-            const x = Math.random() * (window.innerWidth - 150) + 75;
-            const y = Math.random() * (window.innerHeight - 150) + 75;
+            const pad = 100;
+            const x = Math.random() * (window.innerWidth - pad * 2) + pad;
+            const y = Math.random() * (window.innerHeight - pad * 2) + pad;
+            
             target.style.left = x + 'px';
             target.style.top = y + 'px';
-            target.style.transform = `translate(-50%, -50%) rotate(${(Math.random()-0.5)*60}deg)`;
+            
+            const rotation = (Math.random() - 0.5) * 80;
+            target.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
         }
 
         let gameLoop = setInterval(moveTarget, state.speed);
@@ -200,22 +220,23 @@
             state.score += (1 * state.multiplier);
             state.combo++;
             
-            if (state.combo % 5 === 0 && state.speed > 400) {
+            // Makin lama makin cepat
+            if (state.combo % 5 === 0 && state.speed > 500) {
                 state.speed -= 100;
                 resetLoop();
             }
 
             render();
-            if(e) spawnEffect(e.clientX, e.clientY, `+${1*state.multiplier} MEOW`, '#00ffff');
+            if(e) spawnEffect(e.clientX, e.clientY, `+${1 * state.multiplier} MEOW`, varColor());
             moveTarget();
         }
 
         function onMiss(e) {
             if (e.target.id === 'shop-toggle' || shop.contains(e.target)) return;
             state.combo = 0;
-            document.getElementById('game-container').classList.remove('glitch');
+            container.classList.remove('glitch');
             render();
-            spawnEffect(e.clientX, e.clientY, "MISS!", "red");
+            spawnEffect(e.clientX, e.clientY, "COMBO RESET!", "red");
         }
 
         function resetLoop() {
@@ -225,9 +246,15 @@
 
         function render() {
             scoreEl.innerText = Math.floor(state.score);
-            comboEl.style.display = state.combo > 2 ? 'block' : 'none';
-            comboEl.innerText = 'COMBO x' + state.combo;
-            if (state.combo > 15) document.getElementById('game-container').classList.add('glitch');
+            if (state.combo > 2) {
+                comboEl.style.display = 'block';
+                comboEl.innerText = `MEOW COMBO x${state.combo}`;
+                comboEl.style.transform = `scale(${1 + state.combo/25})`;
+            } else {
+                comboEl.style.display = 'none';
+            }
+
+            if (state.combo > 15) container.classList.add('glitch');
         }
 
         function spawnEffect(x, y, text, color) {
@@ -237,8 +264,14 @@
             el.style.left = x + 'px';
             el.style.top = y + 'px';
             el.style.color = color;
+            el.style.fontSize = '1.8rem';
             document.body.appendChild(el);
-            setTimeout(() => el.remove(), 700);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        function varColor() {
+            const colors = ['#ff00ff', '#00ffff', '#39ff14', '#ffff00'];
+            return colors[Math.floor(Math.random() * colors.length)];
         }
 
         function toggleShop(e) {
@@ -250,13 +283,40 @@
             e.stopPropagation();
             if (state.score < cost) return;
             state.score -= cost;
-            if (type === 'catnip') state.speed += 400;
-            if (type === 'laser') setInterval(() => onTargetClick(null), 1500);
+
+            if (type === 'catnip') state.speed += 500;
+            if (type === 'laser') {
+                setInterval(() => {
+                    state.score += state.multiplier;
+                    render();
+                    moveTarget();
+                }, 1500);
+            }
             if (type === 'wetfood') state.multiplier *= 2;
-            if (type === 'chaos') document.body.style.filter = 'hue-rotate(90deg)';
+            if (type === 'chaos') {
+                container.style.filter = 'hue-rotate(180deg) invert(1)';
+                setInterval(() => spawnEffect(Math.random()*innerWidth, Math.random()*innerHeight, "BRAINROT", varColor()), 2000);
+            }
+            
             resetLoop();
             render();
+            spawnEffect(window.innerWidth/2, window.innerHeight/2, "UPGRADED!", "lime");
         }
+
+        // Event Acak
+        setInterval(() => {
+            if (state.score > 100 && Math.random() > 0.8) {
+                eventText.style.display = 'block';
+                const sPrev = state.speed;
+                state.speed = 180;
+                resetLoop();
+                setTimeout(() => {
+                    eventText.style.display = 'none';
+                    state.speed = sPrev;
+                    resetLoop();
+                }, 4000);
+            }
+        }, 12000);
 
         moveTarget();
     </script>
