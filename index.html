@@ -6,18 +6,22 @@
     <title>DAFFA CLICKER</title>
     <style>
         :root {
-            --neon-pink: #ff00ff;
-            --neon-blue: #00ffff;
-            --neon-green: #39ff14;
+            /* Palet Warna Cute Pastel */
+            --bg-color: #fdf2f8; /* Pink sangat muda */
+            --main-pink: #f472b6; /* Pink cerah tapi lembut */
+            --text-color: #475569; /* Abu-abu tua lembut */
+            --accent-blue: #a5f3fc; /* Biru langit pastel */
+            --accent-yellow: #fef08a; /* Kuning pastel */
+            --panel-bg: rgba(255, 255, 255, 0.9);
         }
 
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background: #000;
-            font-family: 'Comic Sans MS', 'Arial', sans-serif;
-            color: white;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font lebih bersih */
+            color: var(--text-color);
             user-select: none;
             touch-action: manipulation;
         }
@@ -26,49 +30,108 @@
             width: 100vw;
             height: 100vh;
             position: relative;
-            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmOWE4ZDIiIGZpbGwtb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNMDAgaDB2NDBIMEwwIDB6TTIwIDIwaDIwdjIwSDIwVjIweiIvPjwvZz48L2c+PC9zdmc+'); /* Pola kotak tipis */
         }
 
-        /* Interface Atas */
+        /* --- SCREEN: WELCOME & TUTORIAL --- */
+        #welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .cute-card {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(244, 114, 182, 0.2);
+            border: 5px solid var(--main-pink);
+            max-width: 500px;
+        }
+
+        #welcome-screen h1 {
+            color: var(--main-pink);
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0px white;
+        }
+
+        .tutorial-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #64748b;
+        }
+
+        .tutorial-text b { color: var(--main-pink); }
+
+        #play-button {
+            background-color: var(--main-pink);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(244, 114, 182, 0.4);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        #play-button:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(244, 114, 182, 0.5); }
+        #play-button:active { transform: translateY(1px); }
+
+        /* --- SCREEN: GAME --- */
         #top-gui {
             position: absolute;
             top: 30px;
+            width: 100%;
             text-align: center;
             z-index: 100;
             pointer-events: none;
         }
 
         .score-container {
-            font-size: 4rem;
+            font-size: 3.5rem;
             font-weight: 900;
-            text-shadow: 0 0 15px var(--neon-pink);
+            color: var(--main-pink);
             margin: 0;
+            text-shadow: 2px 2px 0px white, -2px -2px 0px white;
         }
 
         #combo-ui {
-            font-size: 2rem;
-            color: var(--neon-blue);
-            text-shadow: 0 0 10px var(--neon-blue);
-            font-style: italic;
+            font-size: 1.8rem;
+            color: #a78bfa; /* Ungu muda */
+            font-weight: bold;
             display: none;
+            margin-top: -10px;
         }
 
         /* Target Kucing */
         #pixie-target {
             position: absolute;
-            width: 150px; /* Ukuran pas untuk mobile/desktop */
+            width: 130px;
             cursor: pointer;
             z-index: 50;
-            transition: transform 0.05s;
-            filter: drop-shadow(0 0 15px white);
+            transition: transform 0.05s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
             transform: translate(-50%, -50%);
+            display: none; /* Sembunyikan sampai game mulai */
         }
 
         #pixie-target:active {
-            transform: translate(-50%, -50%) scale(0.75) rotate(-20deg) !important;
+            transform: translate(-50%, -50%) scale(0.8) rotate(-10deg) !important;
         }
 
         /* Teks Melayang */
@@ -78,67 +141,69 @@
             pointer-events: none;
             z-index: 150;
             animation: floatMove 0.8s ease-out forwards;
+            font-size: 1.5rem;
         }
 
         @keyframes floatMove {
             0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(30px, -150px) scale(1.8); opacity: 0; }
+            100% { transform: translate(10px, -100px) scale(1.4); opacity: 0; }
         }
 
         /* Panel Shop */
         #shop-toggle {
             position: absolute;
             bottom: 25px;
-            right: 25px;
-            background: var(--neon-green);
-            color: black;
-            padding: 15px 30px;
+            left: 25px; /* Pindah ke kiri biar ga tabrakan sama target awal */
+            background-color: white;
+            color: var(--main-pink);
+            padding: 12px 24px;
             border-radius: 50px;
             font-weight: bold;
-            font-size: 1.2rem;
             cursor: pointer;
             z-index: 200;
-            border: 4px solid black;
-            box-shadow: 0 0 15px var(--neon-green);
+            border: 3px solid var(--main-pink);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
         }
 
         #shop-panel {
             position: absolute;
-            right: -320px;
+            right: -300px;
             top: 0;
-            width: 280px;
+            width: 260px;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            border-left: 4px solid var(--neon-green);
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: var(--panel-bg);
+            border-left: 3px solid var(--accent-blue);
+            transition: 0.3s;
             z-index: 199;
-            padding: 30px 20px;
+            padding: 25px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
+            backdrop-filter: blur(5px);
         }
 
         #shop-panel.open { right: 0; }
 
         .upgrade-btn {
-            background: #1a1a1a;
-            border: 2px solid var(--neon-blue);
-            color: white;
-            padding: 15px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            color: var(--text-color);
+            padding: 12px;
             text-align: left;
             cursor: pointer;
             border-radius: 12px;
             font-family: inherit;
         }
 
-        .upgrade-btn b { color: var(--neon-green); font-size: 1.1rem; }
+        .upgrade-btn:hover { border-color: var(--main-pink); background-color: #fff1f2; }
+        .upgrade-btn b { color: var(--main-pink); }
 
-        /* Efek Chaos */
-        .glitch { animation: glitch 0.15s infinite; }
-        @keyframes glitch {
-            0% { transform: translate(3px, 3px); }
-            50% { transform: translate(-3px, -3px) rotate(1deg); }
+        /* Effects */
+        .wobble { animation: wobble 0.3s infinite; }
+        @keyframes wobble {
+            0% { transform: translate(1px, 1px); }
+            50% { transform: translate(-1px, -1px) rotate(1deg); }
             100% { transform: translate(0); }
         }
 
@@ -147,163 +212,69 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 5rem;
-            color: #ff0000;
+            font-size: 4rem;
+            color: #fcd34d; /* Kuning cerah */
             font-weight: 900;
             z-index: 300;
             display: none;
             text-align: center;
-            text-shadow: 5px 5px 20px black;
+            text-shadow: 3px 3px 0px white, -3px -3px 0px white;
             pointer-events: none;
         }
     </style>
 </head>
 <body onclick="onMiss(event)">
 
+    <div id="welcome-screen">
+        <div class="cute-card">
+            <h1>Halo Daffa!</h1>
+            <p class="tutorial-text">
+                Selamat datang di game santai ini. Tugas kamu mudah:<br><br>
+                1. <b>Klik gambar kucing</b> secepat mungkin.<br>
+                2. Jangan sampai <b>meleset</b> (klik area kosong).<br>
+                3. Kumpulkan <b>Meow Points</b> untuk beli upgrade imut!<br><br>
+                Siap bermain?
+            </p>
+            <button id="play-button" onclick="startGame()">Mulai Game ✨</button>
+        </div>
+    </div>
+
     <div id="game-container">
-        <div id="event-overlay">3AM ZOOMIES!!!</div>
+        <div id="event-overlay">WAKTU BERMAIN! 🐾</div>
 
         <div id="top-gui">
-            <h1 class="score-container">SCORE: <span id="score-val">0</span></h1>
-            <div id="combo-ui">MEOW COMBO x0</div>
+            <h1 class="score-container">MEOW: <span id="score-val">0</span></h1>
+            <div id="combo-ui">Combo x0 ✨</div>
         </div>
 
         <img id="pixie-target" 
-             src="daffa.png" 
-             alt="Pixie" 
+             src="daffa.jpg" 
+             alt="Kucing Imut" 
              onclick="onTargetClick(event)">
 
-        <button id="shop-toggle" onclick="toggleShop(event)">SHOP (UPGRADES)</button>
+        <button id="shop-toggle" onclick="toggleShop(event)">🎁 Kedai Kucing</button>
         
-        <div id="shop-panel" id="shop">
-            <h2 style="color: var(--neon-green); margin-bottom: 10px;">SHOP</h2>
-            <button class="upgrade-btn" onclick="buyUpgrade('catnip', 50, event)">
-                🌿 <b>Catnip (50)</b><br>Bikin Daffa lebih lambat.
-            </button>
-            <button class="upgrade-btn" onclick="buyUpgrade('laser', 150, event)">
-                🔴 <b>Laser (150)</b><br>Auto-klik tiap 1.5 detik.
-            </button>
-            <button class="upgrade-btn" onclick="buyUpgrade('wetfood', 500, event)">
-                🥫 <b>Wet Food (500)</b><br>Skor dapet 2x lipat!
-            </button>
-            <button class="upgrade-btn" onclick="buyUpgrade('chaos', 1000, event)">
-                🌀 <b>Chaos Mode (1000)</b><br>Hancurkan layar ini.
-            </button>
+        <div id="shop-panel">
+            <h2 style="color: var(--main-pink); margin-top: 0;">Upgrade Imut</h2>
+            <button class="upgrade-btn" onclick="buyUpgrade('catnip', 50, event)">🌿 <b>Susu Ajaib (50)</b><br>Kucing jadi lebih santai.</button>
+            <button class="upgrade-btn" onclick="buyUpgrade('laser', 150, event)">🔴 <b>Mainan Laser (150)</b><br>Auto-klik tiap 1.5 detik.</button>
+            <button class="upgrade-btn" onclick="buyUpgrade('wetfood', 500, event)">🥫 <b>Makanan Enak (500)</b><br>Poin dapet 2x lipat!</button>
+            <button class="upgrade-btn" onclick="buyUpgrade('pola', 1000, event)">🌀 <b>Pola Berwarna (1000)</b><br>Ubah warna background.</button>
         </div>
     </div>
 
     <script>
-        let state = { score: 0, combo: 0, multiplier: 1, speed: 1800, autoClickers: 0 };
+        // Game State
+        let state = { score: 0, combo: 0, multiplier: 1, speed: 1900, isPlaying: false };
+        let gameLoop;
+
+        // Elements
         const target = document.getElementById('pixie-target');
         const scoreEl = document.getElementById('score-val');
         const comboEl = document.getElementById('combo-ui');
         const shop = document.getElementById('shop-panel');
         const container = document.getElementById('game-container');
-        const eventText = document.getElementById('event-overlay');
-
-        function moveTarget() {
-            const pad = 100;
-            const x = Math.random() * (window.innerWidth - pad * 2) + pad;
-            const y = Math.random() * (window.innerHeight - pad * 2) + pad;
-            
-            target.style.left = x + 'px';
-            target.style.top = y + 'px';
-            
-            const rotation = (Math.random() - 0.5) * 80;
-            target.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-        }
-
-        let gameLoop = setInterval(moveTarget, state.speed);
-
-        function onTargetClick(e) {
-            if(e) e.stopPropagation();
-            state.score += (1 * state.multiplier);
-            state.combo++;
-            
-            // Makin lama makin cepat
-            if (state.combo % 5 === 0 && state.speed > 500) {
-                state.speed -= 100;
-                resetLoop();
-            }
-
-            render();
-            if(e) spawnEffect(e.clientX, e.clientY, `+${1 * state.multiplier} MEOW`, varColor());
-            moveTarget();
-        }
-
-        function onMiss(e) {
-            if (e.target.id === 'shop-toggle' || shop.contains(e.target)) return;
-            state.combo = 0;
-            container.classList.remove('glitch');
-            render();
-            spawnEffect(e.clientX, e.clientY, "COMBO RESET!", "red");
-        }
-
-        function resetLoop() {
-            clearInterval(gameLoop);
-            gameLoop = setInterval(moveTarget, state.speed);
-        }
-
-        function render() {
-            scoreEl.innerText = Math.floor(state.score);
-            if (state.combo > 2) {
-                comboEl.style.display = 'block';
-                comboEl.innerText = `MEOW COMBO x${state.combo}`;
-                comboEl.style.transform = `scale(${1 + state.combo/25})`;
-            } else {
-                comboEl.style.display = 'none';
-            }
-
-            if (state.combo > 15) container.classList.add('glitch');
-        }
-
-        function spawnEffect(x, y, text, color) {
-            const el = document.createElement('div');
-            el.className = 'float-text';
-            el.innerText = text;
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
-            el.style.color = color;
-            el.style.fontSize = '1.8rem';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 800);
-        }
-
-        function varColor() {
-            const colors = ['#ff00ff', '#00ffff', '#39ff14', '#ffff00'];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-
-        function toggleShop(e) {
-            e.stopPropagation();
-            shop.classList.toggle('open');
-        }
-
-        function buyUpgrade(type, cost, e) {
-            e.stopPropagation();
-            if (state.score < cost) return;
-            state.score -= cost;
-
-            if (type === 'catnip') state.speed += 500;
-            if (type === 'laser') {
-                setInterval(() => {
-                    state.score += state.multiplier;
-                    render();
-                    moveTarget();
-                }, 1500);
-            }
-            if (type === 'wetfood') state.multiplier *= 2;
-            if (type === 'chaos') {
-                container.style.filter = 'hue-rotate(180deg) invert(1)';
-                setInterval(() => spawnEffect(Math.random()*innerWidth, Math.random()*innerHeight, "BRAINROT", varColor()), 2000);
-            }
-            
-            resetLoop();
-            render();
-            spawnEffect(window.innerWidth/2, window.innerHeight/2, "UPGRADED!", "lime");
-        }
-
-        // Event Acak
+        const eventText =cak
         setInterval(() => {
             if (state.score > 100 && Math.random() > 0.8) {
                 eventText.style.display = 'block';
