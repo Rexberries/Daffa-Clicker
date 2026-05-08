@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DAFFA CLICKER: BRAINROT EDITION</title>
+    <style>
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --neon-green: #39ff14;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Comic Sans MS', sans-serif;
+            color: white;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+        }
+
+        /* UI Styling */
+        #top-gui {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .score-container {
+            font-size: 3.5rem;
+            font-weight: 900;
+            text-shadow: 0 0 10px var(--neon-pink);
+            margin: 0;
+        }
+
+        #combo-ui {
+            font-size: 1.8rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
+            display: none;
+        }
+
+        /* Target Kucing */
+        #pixie-target {
+            position: absolute;
+            width: 140px;
+            cursor: pointer;
+            z-index: 50;
+            transition: transform 0.05s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 0 10px white);
+            transform: translate(-50%, -50%);
+        }
+
+        #pixie-target:active {
+            transform: translate(-50%, -50%) scale(0.7) rotate(-15deg) !important;
+        }
+
+        /* Floating Text */
+        .float-text {
+            position: absolute;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 150;
+            animation: floatMove 0.7s ease-out forwards;
+        }
+
+        @keyframes floatMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(20px, -120px) scale(1.5); opacity: 0; }
+        }
+
+        /* Shop Panel */
+        #shop-toggle {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: var(--neon-green);
+            color: black;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 200;
+            border: none;
+        }
+
+        #shop-panel {
+            position: absolute;
+            right: -300px;
+            top: 0;
+            width: 260px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            border-left: 3px solid var(--neon-green);
+            transition: 0.3s;
+            z-index: 199;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #shop-panel.open { right: 0; }
+
+        .upgrade-btn {
+            background: #222;
+            border: 1px solid var(--neon-blue);
+            color: white;
+            padding: 10px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .upgrade-btn b { color: var(--neon-green); }
+
+        /* Effects */
+        .glitch { animation: glitch 0.1s infinite; }
+        @keyframes glitch {
+            0% { transform: translate(2px, 2px); }
+            50% { transform: translate(-2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        #event-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            color: red;
+            font-weight: bold;
+            z-index: 300;
+            display: none;
+            text-align: center;
+            text-shadow: 5px 5px black;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body onclick="onMiss(event)">
+
+    <div id="game-container">
+        <div id="event-overlay">3AM ZOOMIES!!!</div>
+
+        <div id="top-gui">
+            <h1 class="score-container">SCORE: <span id="score-val">0</span></h1>
+            <div id="combo-ui">COMBO x0</div>
+        </div>
+
+        <img id="pixie-target" 
+             src="https://r2.erweima.ai/i/p/3c67554f63c8466699d75b31df688da9.png" 
+             alt="Pixie" 
+             onclick="onTargetClick(event)">
+
+        <button id="shop-toggle" onclick="toggleShop(event)">SHOP</button>
+        
+        <div id="shop-panel">
+            <h2 style="color: var(--neon-green);">BRAINROT SHOP</h2>
+            <button class="upgrade-btn" onclick="buyUpgrade('catnip', 50, event)">🌿 <b>Catnip (50)</b><br>Slows down Pixie</button>
+            <button class="upgrade-btn" onclick="buyUpgrade('laser', 150, event)">🔴 <b>Laser (150)</b><br>Auto-clicks 1.5s</button>
+            <button class="upgrade-btn" onclick="buyUpgrade('wetfood', 500, event)">🥫 <b>Wet Food (500)</b><br>Score x2 Multiplier</button>
+            <button class="upgrade-btn" onclick="buyUpgrade('chaos', 1000, event)">🌀 <b>Chaos (1000)</b><br>Visual Glitch</button>
+        </div>
+    </div>
+
+    <script>
+        let state = { score: 0, combo: 0, multiplier: 1, speed: 1800 };
+        const target = document.getElementById('pixie-target');
+        const scoreEl = document.getElementById('score-val');
+        const comboEl = document.getElementById('combo-ui');
+        const shop = document.getElementById('shop-panel');
+
+        function moveTarget() {
+            const x = Math.random() * (window.innerWidth - 150) + 75;
+            const y = Math.random() * (window.innerHeight - 150) + 75;
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+            target.style.transform = `translate(-50%, -50%) rotate(${(Math.random()-0.5)*60}deg)`;
+        }
+
+        let gameLoop = setInterval(moveTarget, state.speed);
+
+        function onTargetClick(e) {
+            if(e) e.stopPropagation();
+            state.score += (1 * state.multiplier);
+            state.combo++;
+            
+            if (state.combo % 5 === 0 && state.speed > 400) {
+                state.speed -= 100;
+                resetLoop();
+            }
+
+            render();
+            if(e) spawnEffect(e.clientX, e.clientY, `+${1*state.multiplier} MEOW`, '#00ffff');
+            moveTarget();
+        }
+
+        function onMiss(e) {
+            if (e.target.id === 'shop-toggle' || shop.contains(e.target)) return;
+            state.combo = 0;
+            document.getElementById('game-container').classList.remove('glitch');
+            render();
+            spawnEffect(e.clientX, e.clientY, "MISS!", "red");
+        }
+
+        function resetLoop() {
+            clearInterval(gameLoop);
+            gameLoop = setInterval(moveTarget, state.speed);
+        }
+
+        function render() {
+            scoreEl.innerText = Math.floor(state.score);
+            comboEl.style.display = state.combo > 2 ? 'block' : 'none';
+            comboEl.innerText = 'COMBO x' + state.combo;
+            if (state.combo > 15) document.getElementById('game-container').classList.add('glitch');
+        }
+
+        function spawnEffect(x, y, text, color) {
+            const el = document.createElement('div');
+            el.className = 'float-text';
+            el.innerText = text;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.color = color;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 700);
+        }
+
+        function toggleShop(e) {
+            e.stopPropagation();
+            shop.classList.toggle('open');
+        }
+
+        function buyUpgrade(type, cost, e) {
+            e.stopPropagation();
+            if (state.score < cost) return;
+            state.score -= cost;
+            if (type === 'catnip') state.speed += 400;
+            if (type === 'laser') setInterval(() => onTargetClick(null), 1500);
+            if (type === 'wetfood') state.multiplier *= 2;
+            if (type === 'chaos') document.body.style.filter = 'hue-rotate(90deg)';
+            resetLoop();
+            render();
+        }
+
+        moveTarget();
+    </script>
+</body>
+</html>
