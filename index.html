@@ -3,38 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DAFFA CLICKER: DEAR EDITION</title>
+    <title>DAFFA CLICKER</title>
     <style>
         :root {
-            --main-pink: #fb7185;
-            --soft-pink: #fff1f2;
-            --accent-blue: #7dd3fc;
-            --text-color: #4c1d95;
+            --pink-soft: #fdf2f8;
+            --pink-bright: #f472b6;
+            --purple-cute: #a78bfa;
+            --text-dark: #475569;
         }
 
         body {
             margin: 0; padding: 0; overflow: hidden;
-            background-color: var(--soft-pink);
-            font-family: 'Segoe UI', sans-serif;
-            color: var(--text-color);
+            background-color: var(--pink-soft);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: var(--text-dark);
             user-select: none;
             touch-action: manipulation;
         }
 
-        /* --- WELCOME SCREEN --- */
+        /* --- LAYAR AWAL (WELCOME) --- */
         #welcome-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--soft-pink);
-            z-index: 1000; display: flex; justify-content: center; align-items: center;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--pink-soft);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000;
         }
 
         .card {
-            background: white; padding: 40px; border-radius: 30px;
-            border: 6px solid var(--main-pink); text-align: center;
-            box-shadow: 0 15px 0px #fda4af; max-width: 400px;
+            background: white; padding: 40px; border-radius: 35px;
+            border: 6px solid var(--pink-bright); text-align: center;
+            box-shadow: 0 10px 25px rgba(244, 114, 182, 0.2);
+            max-width: 350px;
         }
 
-        h1 { color: var(--main-pink); margin-top: 0; }
+        h1 { color: var(--pink-bright); font-size: 2.5rem; margin-bottom: 15px; }
+
+        .btn-play {
+            background: var(--pink-bright); color: white; border: none;
+            padding: 15px 40px; font-size: 1.5rem; border-radius: 50px;
+            cursor: pointer; font-weight: bold; transition: 0.2s;
+            box-shadow: 0 6px 0px #db2777;
+        }
+
+        .btn-play:active { transform: translateY(4px); box-shadow: 0 2px 0px #db2777; }
+
+        /* --- AREA GAME --- */
+        #game-container {
+            width: 100vw; height: 100vh; position: relative;
+            visibility: hidden; /* Disembunyikan dulu sampai tombol diklik */
+        }
+
+        #gui {
+            position: absolute; top: 20px; width: 100%; text-align: center;
+            pointer-events: none; z-index: 100;
+        }
+
+        .score { font-size: 4rem; font-weight: 900; color: var(--pink-bright); margin: 0; text-shadow: 2px 2px white; }
+        .stats { font-size: 1.2rem; color: var(--purple-cute); font-weight: bold; }
+
+        /* Target Kucing */
+        #pixie-target {
+            position: absolute; width: 140px; cursor: pointer;
+            z-index: 50; transform: translate(-50%, -50%);
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+            transition: transform 0.05s;
+        }
+
+        /* --- SHOP --- */
+        #shop-toggle {
+            position: absolute; bottom: 20px; left: 20px;
+            background: white; border: 3px solid var(--pink-bright);
+            padding: 12px 25px; border-radius: 50px; cursor: pointer;
+            z-index: 200; font-weight: bold; color: var(--pink-bright);
+        }
+
+        #shop-panel {
+            position: absolute; right: -320px; top: 0; width: 280px; height: 100%;
+            background: rgba(255, 255, 255, 0.9); border-left: 5px solid var(--pink-bright);
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 199;
+            padding: 25px; box-sizing: border-box; backdrop-filter: blur(10px);
+        }
+
+        #shop-panel.open { right: 0; }
+
+        .item {
+            background: white; border: 2px solid #fee2e2; padding: 15px;
+            border-radius: 18px; margin-bottom: 12px; cursor: pointer; transition: 0.2s;
+        }
+        .item:hover { border-color: var(--pink-bright); transform: scale(1.02); }
+        .item b { color: var(--pink-bright); font-size: 1.1rem; }
+        .item small { color: #64748b; font-size: 0.85rem; }
+
+        /* ANIMASI */
+        .float-text {
+            position: absolute; font-weight: 900; pointer-events: none;
+            z-index: 500; animation: float 0.8s ease-out forwards;
+        }
+        @keyframes float {
+            0% { transform: translate(0,0) scale(1); opacity: 1; }
+            100% { transform: translate(20px, -120px) scale(1.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body onclick="onMiss(event)">
+
+    <div id="welcome-screen">
+        <div class="card">
+            <h1>HAI SAYANGG ❤️</h1>
+            <p>Klik kucingnya untuk kumpulkan poin ya!</p>
+            <button class="btn-play" onclick="startGame()">MAIN ✨</button>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <div id="gui">
+            <h1 class="score" id="score-val">0</h1>
+            <div class="stats" id="stats-val">Combo: 0 | Multiplier: 1x</div>
+        </div>
+
+        <img id="pixie-target" src="daffa.jpg" alt="Kucing" onclick="onTargetClick(event)">
+
+        <button id="shop-toggle" onclick="toggleShop(event)">🎁 Kedai Hadiah</button>
+        
+        <div id="shop-panel" id="shop">
+            <h2 style="color: var(--pink-bright);">Hadiah Imut</h2>
+            <div class="item" onclick="buy('slow', 50)">
+                <b>🍼 Susu Cokelat (50)</b>
+                <small>Kucing jadi lebih kalem (lambat)</small>
+            </div>
+            <div class="item" onclick="buy('auto', 200)">
+                <b>🤖 Robot Teman (200)</b>
+                <small>Klik otomatis tiap 1.2 detik</small>
+            </div>
+            <div class="item" onclick="buy('power', 500)">
+                <b>🍬 Permen Ajaib (500)</b>
+                <small>Setiap klik dapet 2x lipat poin!</small>
+            </div>
+            <div class="item" onclick="buy('fever', 1500)">
+                <b>🔥 Semangat Sayang (1500)</b>
+                <small>Multiplier naik drastis!</small>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            score: 0,
+            combo: 0,
+            power: 1,
+            speed: 1800,
+            isLive: false
+        };
+
+        const target = document.getElementById('pixie-target');
+        const scoreDisplay = document.getElementById('score-val');
+        const statsDisplay = document.getElementById('stats-val');
+        const shop = document.getElementById('shop-panel');
+        let gameInterval;
+
+        // --- FUNGSI MULAI ---
+        function startGame() {
+            state.isLive = true;
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('game-container').style.visibility = 'visible';
+            moveKucing();
+            resetTimer();
+        }
+
+        function moveKucing() {
+            if (!state.isLive) return;
+            const x = Math.random() * (window.innerWidth - 140) + 70;
+            const y = Math.random() * (window.innerHeight - 200) + 100;
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+            target.style.transform = `translate(-50%, -50%) rotate(${(Math.random()-0.5)*40}deg)`;
+        }
+
+        function resetTimer() {
+            clearInterval(gameInterval);
+            gameInterval = setInterval(moveKucing, state.speed);
+        }
+
+        function onTargetClick(e) {
+            e.stopPropagation();
+            if (!state.isLive) return;
+
+            // Logika Combo (Tiap 10 combo nambah power)
+            state.combo++;
+            let comboBonus = Math.floor(state.combo / 10);
+            let gained = state.power + comboBonus;
+            
+            state.score += gained;
+            
+            spawnFloat(e.clientX, e.clientY, `+${gained} ❤️`, '#f472b6');
+            updateUI();
+            moveKucing();
+            resetTimer();
+
+            // Tingkat kesulitan naik
+            if (state.combo % 5 === 0 && state.speed > 500) {
+                state.speed -= 80;
+            }
+        }
+
+        function onMiss(e) {
+            if (!state.isLive) return;
+            if (e.target.id === 'shop-toggle' || shop.contains(e.target)) return;
+
+            state.combo = 0;
+            updateUI();
+            spawnFloat(e.clientX, e.clientY, "Oops! 💔", "#94a3b8");
+        }
+
+        function updateUI() {
+            scoreDisplay.innerText = Math.floor(state.score);
+            let currentMult = state.power + Math.floor(state.combo/10);
+            statsDisplay.innerText = `Combo: ${state.combo} | Multiplier: ${currentMult}x`;
+        }
+
+        function spawnFloat(x, y, txt, color) {
+            const el = document.createElement('div');
+            el.className = 'float-text';
+            el.innerText = txt;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.color = color;
+            el.style.fontSize = '1.5rem';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        function toggleShop(e) {
+            e.stopPropagation();
+            shop.classList.toggle('open');
+        }
+
+        function buy(type, cost) {
+            if (state.score >= cost) {
+                state.score -= cost;
+                if (type === 'slow') state.speed += 500;
+                if (type === 'auto') setInterval(() => { state.score += state.power; updateUI(); }, 1200);
+                if (type === 'power') state.power += 1;
+                if (type === 'fever') state.power += 4;
+                
+                updateUI();
+                spawnFloat(window.innerWidth/2, window.innerHeight/2, "Berhasil! ✨", "#4ade80");
+            } else {
+                alert("Poin belum cukup, Sayang! Semangat kliknya! ❤️");
+            }
+        }
+    </script>
+</body>
+</html>        h1 { color: var(--main-pink); margin-top: 0; }
         .btn-play {
             background: var(--main-pink); color: white; border: none;
             padding: 15px 40px; font-size: 1.5rem; border-radius: 50px;
