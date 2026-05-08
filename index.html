@@ -3,38 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DAFFA CLICKER</title>
+    <title>DAFFA CLICKER: DEAR EDITION</title>
     <style>
         :root {
-            /* Palet Warna Cute Pastel */
-            --bg-color: #fdf2f8; /* Pink sangat muda */
-            --main-pink: #f472b6; /* Pink cerah tapi lembut */
-            --text-color: #475569; /* Abu-abu tua lembut */
-            --accent-blue: #a5f3fc; /* Biru langit pastel */
-            --accent-yellow: #fef08a; /* Kuning pastel */
-            --panel-bg: rgba(255, 255, 255, 0.9);
+            --main-pink: #fb7185;
+            --soft-pink: #fff1f2;
+            --accent-blue: #7dd3fc;
+            --text-color: #4c1d95;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: var(--bg-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font lebih bersih */
+            margin: 0; padding: 0; overflow: hidden;
+            background-color: var(--soft-pink);
+            font-family: 'Segoe UI', sans-serif;
             color: var(--text-color);
             user-select: none;
             touch-action: manipulation;
         }
 
-        #game-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmOWE4ZDIiIGZpbGwtb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNMDAgaDB2NDBIMEwwIDB6TTIwIDIwaDIwdjIwSDIwVjIweiIvPjwvZz48L2c+PC9zdmc+'); /* Pola kotak tipis */
+        /* --- WELCOME SCREEN --- */
+        #welcome-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--soft-pink);
+            z-index: 1000; display: flex; justify-content: center; align-items: center;
         }
 
-        /* --- SCREEN: WELCOME & TUTORIAL --- */
-        #welcome-screen {
+        .card {
+            background: white; padding: 40px; border-radius: 30px;
+            border: 6px solid var(--main-pink); text-align: center;
+            box-shadow: 0 15px 0px #fda4af; max-width: 400px;
+        }
+
+        h1 { color: var(--main-pink); margin-top: 0; }
+        .btn-play {
+            background: var(--main-pink); color: white; border: none;
+            padding: 15px 40px; font-size: 1.5rem; border-radius: 50px;
+            cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        .btn-play:hover { transform: scale(1.1); background: #f43f5e; }
+
+        /* --- GAME UI --- */
+        #game-container { width: 100vw; height: 100vh; position: relative; display: none; }
+        
+        #gui {
+            position: absolute; top: 20px; width: 100%; text-align: center;
+            pointer-events: none; z-index: 100;
+        }
+
+        .score { font-size: 3.5rem; font-weight: 900; color: var(--main-pink); margin: 0; }
+        .stats { font-size: 1.2rem; font-weight: bold; opacity: 0.8; }
+
+        #pixie-target {
+            position: absolute; width: 140px; cursor: pointer;
+            z-index: 50; transform: translate(-50%, -50%);
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
+        }
+
+        /* --- SHOP --- */
+        #shop-toggle {
+            position: absolute; bottom: 20px; left: 20px;
+            background: white; border: 3px solid var(--main-pink);
+            padding: 10px 20px; border-radius: 50px; cursor: pointer;
+            z-index: 200; font-weight: bold; color: var(--main-pink);
+        }
+
+        #shop-panel {
+            position: absolute; right: -320px; top: 0; width: 280px; height: 100%;
+            background: rgba(255,255,255,0.95); border-left: 5px solid var(--main-pink);
+            transition: 0.3s; z-index: 199; padding: 20px; box-sizing: border-box;
+            backdrop-filter: blur(10px);
+        }
+        #shop-panel.open { right: 0; }
+
+        .item {
+            background: white; border: 2px solid #fee2e2; padding: 12px;
+            border-radius: 15px; margin-bottom: 10px; cursor: pointer;
+        }
+        .item:hover { border-color: var(--main-pink); }
+        .item b { color: var(--main-pink); display: block; margin-bottom: 3px; }
+        .item small { color: #9ca3af; }
+
+        /* ANIMATION */
+        .float-text {
+            position: absolute; font-weight: 900; pointer-events: none;
+            z-index: 500; animation: float 0.8s forwards;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="welcome-screen">
+        <div class="card">
+            <h1>Halo Sayang! ❤️</h1>
+            <p>Klik kucing secepat mungkin untuk kumpulkan cinta!</p>
+            <p><small>Tips: Combo tinggi = Poin melimpah!</small></p>
+            <br>
+            <button class="btn-play" onclick="initGame()">Mulai Klik! ✨</button>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <div id="gui">
+            <h1 class="score" id="score-val">0</h1>
+            <div class="stats" id="stats-val">Combo: 0 | Multiplier: 1x</div>
+        </div>
+
+        <img id="pixie-target" src="daffa.jpg" alt="Kucing" onclick="handleKlik(event)">
+
+        <button id="shop-toggle" onclick="document.getElementById('shop-panel').classList.toggle('open')">🎁 Hadiah</button>
+        
+        <div id="shop-panel">
+            <h2 style="color: var(--main-pink);">Kedai Cinta</h2>
+            
+            <div class="item" onclick="beli('susu', 100)">
+                <b>🍼 Susu Hangat (100)</b>
+                <small>Bikin kucing tenang (gerak melambat)</small>
+            </div>
+            
+            <div class="item" onclick="beli('auto', 350)">
+                <b>🤖 Robot Klik (350)</b>
+                <small>Klik otomatis tiap 1 detik</small>
+            </div>
+            
+            <div class="item" onclick="beli('vitamin', 800)">
+                <b>💊 Vitamin Strong (800)</b>
+                <small>Poin dasar naik jadi 2x lipat</small>
+            </div>
+            
+            <div class="item" onclick="beli('fever', 2000)">
+                <b>💖 Cat Fever (2000)</b>
+                <small>Dapatkan 5x poin lebih banyak!</small>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = {
+            score: 0,
+            combo: 0,
+            basePower: 1,
+            shopMult: 1,
+            speed: 1800,
+            isPlaying: false
+        };
+
+        const target = document.getElementById('pixie-target');
+        const scoreDisplay = document.getElementById('score-val');
+        const statsDisplay = document.getElementById('stats-val');
+        let loop;
+
+        function initGame() {
+            data.isPlaying = true;
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            posisiKucing();
+            startLoop();
+        }
+
+        function startLoop() {
+            clearInterval(loop);
+            loop = setInterval(posisiKucing, data.speed);
+        }
+
+        function posisiKucing() {
+            const x = Math.random() * (window.innerWidth - 140) + 70;
+            const y = Math.random() * (window.innerHeight - 200) + 100;
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+            target.style.transform = `translate(-50%, -50%) rotate(${(Math.random()-0.5)*30}deg)`;
+        }
+
+        function handleKlik(e) {
+            e.stopPropagation();
+            
+            // Combo System: Setiap 10 combo nambah 1x multiplier
+            data.combo++;
+            let comboBonus = Math.floor(data.combo / 10);
+            let totalPoin = (data.basePower * data.shopMult) + comboBonus;
+            
+            data.score += totalPoin;
+
+            // Efek visual & update layar
+            spawnTeks(e.clientX, e.clientY, `+${totalPoin} ❤️`);
+            updateLayar();
+            posisiKucing();
+            startLoop(); // Reset timer tiap diklik biar ga kabur pas mau diklik
+
+            // Makin jago, makin menantang
+            if(data.combo % 5 === 0 && data.speed > 500) {
+                data.speed -= 50;
+            }
+        }
+
+        // Jika klik di luar kucing
+        window.onclick = function(e) {
+            if(e.target.id !== 'pixie-target' && data.isPlaying) {
+                data.combo = 0;
+                updateLayar();
+                spawnTeks(e.clientX, e.clientY, "Meleset! 💔", "#94a3b8");
+            }
+        }
+
+        function updateLayar() {
+            scoreDisplay.innerText = Math.floor(data.score);
+            let multAktif = data.shopMult + Math.floor(data.combo/10);
+            statsDisplay.innerText = `Combo: ${data.combo} | Multiplier: ${multAktif}x`;
+        }
+
+        function spawnTeks(x, y, teks, warna = "#fb7185") {
+            const div = document.createElement('div');
+            div.className = 'float-text';
+            div.innerText = teks;
+            div.style.left = x + 'px';
+            div.style.top = y + 'px';
+            div.style.color = warna;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 800);
+        }
+
+        function beli(item, harga) {
+            if(data.score >= harga) {
+                data.score -= harga;
+                if(item === 'susu') data.speed += 400;
+                if(item === 'auto') setInterval(() => { data.score += data.shopMult; updateLayar(); }, 1000);
+                if(item === 'vitamin') data.shopMult += 1;
+                if(item === 'fever') data.shopMult += 4;
+                
+                updateLayar();
+                spawnTeks(window.innerWidth/2, window.innerHeight/2, "Upgrade Berhasil! 🎉", "#22c55e");
+            } else {
+                alert("Poin kamu belum cukup, Sayang!");
+            }
+        }
+    </script>
+</body>
+</html>        #welcome-screen {
             position: fixed;
             top: 0;
             left: 0;
