@@ -133,7 +133,7 @@ body{
     transform:translate(-50%,-50%) scale(.9);
 }
 
-/* FLOAT */
+/* FLOAT TEXT */
 .float{
     position:absolute;
     font-weight:900;
@@ -223,14 +223,14 @@ body{
     font-size:.8rem;
 }
 
-/* FEVER */
+/* OVERLAY */
 #fever{
     position:fixed;
     inset:0;
     display:none;
     justify-content:center;
     align-items:center;
-    font-size:2.2rem;
+    font-size:2rem;
     font-weight:900;
     color:#f59e0b;
     text-shadow:3px 3px white;
@@ -266,7 +266,9 @@ body{
 
 <!-- WELCOME -->
 <div id="welcome">
+
     <div class="card">
+
         <h1>Hai Sayang ❤️</h1>
 
         <p>
@@ -274,10 +276,16 @@ body{
             Jangan sampe miss ya 😾
         </p>
 
-        <button class="play-btn" onclick="startGame()">
+        <button
+            class="play-btn"
+            onclick="startGame()">
+
             MAIN ✨
+
         </button>
+
     </div>
+
 </div>
 
 <!-- GAME -->
@@ -288,11 +296,15 @@ body{
     </div>
 
     <div id="top-ui">
-        <div id="score">0</div>
+
+        <div id="score">
+            0
+        </div>
 
         <div id="stats">
             Combo: 0 | Multiplier: 1x
         </div>
+
     </div>
 
     <img
@@ -303,43 +315,72 @@ body{
     >
 
     <!-- SHOP -->
-    <button id="shop-btn" onclick="toggleShop(event)">
+    <button
+        id="shop-btn"
+        onclick="toggleShop(event)">
+
         🎁 Hadiah
+
     </button>
 
     <div id="shop">
 
         <h2>Kedai Imut</h2>
 
-        <div class="item" onclick="buy('slow',50)">
+        <div
+            class="item"
+            onclick="buy('slow',50)">
+
             <b>🍼 Susu Hangat (50)</b>
-            <small>Kucing melambat</small>
+            <small>Kucing jadi lebih lambat</small>
+
         </div>
 
-        <div class="item" onclick="buy('power',200)">
+        <div
+            class="item"
+            onclick="buy('power',200)">
+
             <b>💖 Love Boost (200)</b>
-            <small>Poin klik naik</small>
+            <small>Point jadi x2</small>
+
         </div>
 
-        <div class="item" onclick="buy('auto',500)">
+        <div
+            class="item"
+            onclick="buy('auto',500)">
+
             <b>🤖 Auto Clicker (500)</b>
-            <small>Auto poin tiap detik</small>
+            <small>Auto point tiap detik</small>
+
         </div>
 
-        <div class="item" onclick="buy('fever',1000)">
+        <div
+            class="item"
+            onclick="buy('fever',1000)">
+
             <b>🔥 Final Gift (1000)</b>
             <small>Special surprise ❤️</small>
+
         </div>
 
     </div>
+
 </div>
 
 <script>
+
+/* GAME STATE */
 const state = {
     score:0,
     combo:0,
+
+    /* POINT */
     power:1,
-    speed:1800,
+
+    /* SPEED */
+    baseSpeed:1800,
+    bonusSpeed:0,
+
     playing:false
 };
 
@@ -365,9 +406,11 @@ function startGame(){
     state.playing = true;
 
     document.getElementById("welcome").style.display = "none";
+
     document.getElementById("game").style.display = "block";
 
     moveCat();
+
     resetLoop();
 }
 
@@ -394,16 +437,19 @@ function moveCat(){
         `translate(-50%,-50%) rotate(${(Math.random()-.5)*30}deg)`;
 }
 
-/* TIMER */
+/* LOOP */
 function resetLoop(){
 
     clearInterval(moveLoop);
 
     moveLoop =
-        setInterval(moveCat, state.speed);
+        setInterval(
+            moveCat,
+            state.baseSpeed + state.bonusSpeed
+        );
 }
 
-/* CLICK */
+/* CLICK CAT */
 function clickCat(e){
 
     e.stopPropagation();
@@ -416,7 +462,7 @@ function clickCat(e){
         Math.floor(state.combo / 10);
 
     let gained =
-        state.power + comboBonus;
+        (1 + comboBonus) * state.power;
 
     state.score += gained;
 
@@ -427,15 +473,18 @@ function clickCat(e){
         "#f472b6"
     );
 
-    if(state.combo % 5 === 0 &&
-       state.speed > 500){
-
-        state.speed -= 70;
+    /* MAKIN SUSAH */
+    if(
+        state.combo % 5 === 0 &&
+        state.baseSpeed > 500
+    ){
+        state.baseSpeed -= 70;
     }
 
     updateUI();
 
     moveCat();
+
     resetLoop();
 }
 
@@ -473,24 +522,27 @@ function updateUI(){
         Math.floor(state.score);
 
     const mult =
-        state.power +
-        Math.floor(state.combo/10);
+        state.power *
+        (1 + Math.floor(state.combo/10));
 
     statsEl.innerText =
         `Combo: ${state.combo} | Multiplier: ${mult}x`;
 }
 
-/* FLOAT TEXT */
+/* FLOAT */
 function spawnText(x,y,text,color){
 
     const div =
         document.createElement("div");
 
     div.className = "float";
+
     div.innerText = text;
 
     div.style.left = x + "px";
+
     div.style.top = y + "px";
+
     div.style.color = color;
 
     document.body.appendChild(div);
@@ -519,10 +571,10 @@ function buy(type,cost){
         return;
     }
 
-    /* CEK SCORE */
+    /* SCORE KURANG */
     if(state.score < cost){
 
-        alert("Poin belum cukup 😾");
+        alert("Point belum cukup 😾");
 
         return;
     }
@@ -531,15 +583,21 @@ function buy(type,cost){
 
     purchased[type] = true;
 
-    /* EFFECT */
+    /* SUSU */
     if(type === "slow"){
-        state.speed += 500;
+
+        state.bonusSpeed += 800;
+
+        resetLoop();
     }
 
+    /* LOVE BOOST */
     if(type === "power"){
-        state.power += 1;
+
+        state.power *= 2;
     }
 
+    /* AUTO */
     if(type === "auto"){
 
         setInterval(()=>{
@@ -551,10 +609,10 @@ function buy(type,cost){
         },1000);
     }
 
-    /* FINAL ITEM */
+    /* FINAL GIFT */
     if(type === "fever"){
 
-        state.power += 5;
+        state.power *= 5;
 
         feverEl.innerHTML =
             "Happy Eight Of The Month Sayanggku ❤️";
@@ -562,7 +620,9 @@ function buy(type,cost){
         feverEl.style.display = "flex";
 
         setTimeout(()=>{
+
             feverEl.style.display = "none";
+
         },5000);
     }
 
@@ -582,17 +642,21 @@ function buy(type,cost){
     items.forEach(item => {
 
         if(
-            item.getAttribute("onclick")
+            item
+            .getAttribute("onclick")
             .includes(type)
         ){
 
             item.style.opacity = ".5";
+
             item.style.pointerEvents = "none";
+
             item.style.filter = "grayscale(1)";
         }
     });
 }
+
 </script>
 
 </body>
-</html>
+    </html>
